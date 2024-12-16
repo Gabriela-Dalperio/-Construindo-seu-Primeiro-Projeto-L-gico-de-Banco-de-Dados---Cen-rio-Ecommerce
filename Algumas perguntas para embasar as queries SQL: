@@ -1,0 +1,192 @@
+use ecommerce;
+
+-- Buscando cliente que é Pessoa Jurídica e Concatenando o nome 
+SELECT 
+	Concat (Fname,' ', Minit,' ', Lname) as Nome
+FROM client
+WHERE IdentificationType = 'CNPJ';
+
+-- Buscando o nome do produto e aplicando dois filtros
+SELECT 
+	Pname AS NomeProduto
+FROM product
+WHERE (Avaliation >= 4 AND Category = 'Eletrônico e Dispositivos');
+
+-- Utilizando JOIN para descobrir se algum fornecedor também é vendedor através do CNPJ
+SELECT 
+	a.SocialName AS NomeSocial
+FROM supplier a
+JOIN seller b
+ON a.CNPJ = b.SellerIdentificationNumber;
+
+-- Buscando o nome dos vendedores que estão localizados em SP ou MG
+SELECT
+	SellerSocialName AS NomeSocial,
+    SellerLocation AS Localizacao
+FROM seller
+WHERE (SellerLocation = 'São Paulo' OR SellerLocation = 'Minas Gerais');
+
+-- Buscando o nome dos vendedores que estão localizados em estados com nome Rio
+SELECT
+	SellerSocialName AS NomeSocial,
+    SellerLocation AS Localizacao
+FROM seller
+WHERE SellerLocation LIKE '%Rio%';
+
+-- Utilizando o JOIN para buscar os pedidos que tem valor maior que 200 e o nome do cliente
+SELECT
+	o.idOrderClient AS Numero_Pedido,
+    Concat (c.Fname,' ',c.Lname) AS Cliente,
+    o.Total_Price AS Valor
+FROM orders o
+JOIN client c
+WHERE c.idClient = o.idOrderClient AND o.Total_Price >= 200; 
+
+-- Utilizando o JOIN para 3 tabelas, unindo nº do pedido, nome do cliente e valor total do pedido
+SELECT 
+    o.idOrder AS NumeroPedido,
+    CONCAT(c.Fname, ' ', c.Minit, '. ', c.Lname) AS NomeCliente,
+    SUM(p.Price * po.poQuantity) AS ValorTotalPedido
+FROM Orders o
+JOIN Client c ON o.idOrderClient = c.idClient
+JOIN productOrder po ON o.idOrder = po.idPOorder
+JOIN Product p ON po.idPOproduct = p.idProduct
+GROUP BY o.idOrder, NomeCliente
+ORDER BY o.idOrder;
+
+-- Utilizando o JOIN para 3 tabelas, unindo nº do client, nome do cliente e valor total do pedido maior que 400
+SELECT 
+    c.idClient,
+    CONCAT(c.Fname, ' ', c.Minit, '. ', c.Lname) AS NomeCliente,
+    SUM(p.Price * po.poQuantity) AS ValorTotalPedido
+FROM Orders o
+JOIN Client c ON o.idOrderClient = c.idClient
+JOIN productOrder po ON o.idOrder = po.idPOorder
+JOIN Product p ON po.idPOproduct = p.idProduct
+GROUP BY c.idClient, NomeCliente
+HAVING SUM(p.Price * po.poQuantity) > 400
+ORDER BY ValorTotalPedido;
+
+-- Quantidade total de produtos com fornecedores
+SELECT 
+    ps.idPsProduct AS ProductID,
+    p.Pname AS Nome_Produto,
+    SUM(ps.Quantity) AS Qtde_Total_Produtos_Fornecedores
+FROM ProductSupplier ps
+JOIN product p
+WHERE ps.idPsProduct = p.idProduct
+GROUP BY ps.idPsProduct
+ORDER BY ps.idPsProduct;
+
+-- Quantidade total de produtos com vendedores
+SELECT
+    a.idPproduct AS ProductID,
+    p.Pname AS Nome_Produto,
+    SUM(a.ProductQuantity) AS Qtde_Total_Produtos_Vendedores
+FROM ProductSeller a
+JOIN product p
+WHERE a.idPproduct = p.idProduct
+GROUP BY a.idPproduct
+ORDER BY a.idPproduct;
+
+-- Unindo as informações da quantidade total de produtos de forncedor e vendedor e o status no estoque
+SELECT 
+    ps.idPsProduct AS ProductID,
+    p.Pname AS Nome_Produto,
+    SUM(ps.Quantity) AS Qtde_Total_Produtos,
+    'Fornecedor' AS Origem,
+	p.Estoque AS StatusEstoque
+FROM ProductSupplier ps
+JOIN product p ON ps.idPsProduct = p.idProduct
+GROUP BY ps.idPsProduct, p.Pname
+UNION ALL
+SELECT 
+    a.idPproduct AS ProductID,
+    p.Pname AS Nome_Produto,
+    SUM(a.ProductQuantity) AS Qtde_Total_Produtos,
+    'Vendedor' AS Origem,
+      p.Estoque AS StatusEstoque
+FROM ProductSeller a
+JOIN product p ON a.idPproduct = p.idProduct
+GROUP BY a.idPproduct, p.Pname
+ORDER BY ProductID, Origem;
+
+-- Agrupando a localização do estoque
+SELECT 
+    CASE
+        WHEN Location LIKE '%São Paulo%' THEN 'São Paulo'
+        WHEN Location LIKE '%Rio de Janeiro%' THEN 'Rio de Janeiro'
+        WHEN Location LIKE '%Vitória%' THEN 'Espírito Santo'
+        WHEN Location LIKE '%Belo Horizonte%' THEN 'Minas Gerais'
+        WHEN Location LIKE '%Porto Alegre%' THEN 'Rio Grande do Sul'
+        WHEN Location LIKE '%Curitiba%' THEN 'Paraná'
+        ELSE 'Outros'
+    END AS Estado
+FROM StorageLocation sl
+JOIN ProductStorage ps ON sl.idLproduct = ps.idProduct
+GROUP BY Estado
+ORDER BY Estado;
+
+-- AAgrupando a localização do estoque em productStorage
+SELECT 
+    CASE
+        WHEN StorageLocation LIKE '%SP%' THEN 'São Paulo'
+        WHEN StorageLocation LIKE '%RJ%' THEN 'Rio de Janeiro'
+        WHEN StorageLocation LIKE '%ES%' THEN 'Espírito Santo'
+        WHEN StorageLocation LIKE '%MG%' THEN 'Minas Gerais'
+        WHEN StorageLocation LIKE '%RS%' THEN 'Rio Grande do Sul'
+        WHEN StorageLocation LIKE '%PR%' THEN 'Paraná'
+        ELSE 'Outros'
+    END AS Estado
+FROM productstorage 
+GROUP BY Estado
+ORDER BY Estado;
+
+-- Agrupando as informações anteriores em uma mesma query
+SELECT DISTINCT
+    CASE
+        WHEN Location LIKE '%São Paulo%' OR StorageLocation LIKE '%SP%' THEN 'São Paulo'
+        WHEN Location LIKE '%Rio de Janeiro%' OR StorageLocation LIKE '%RJ%' THEN 'Rio de Janeiro'
+        WHEN Location LIKE '%Vitória%' OR StorageLocation LIKE '%ES%' THEN 'Espírito Santo'
+        WHEN Location LIKE '%Belo Horizonte%' OR StorageLocation LIKE '%MG%' THEN 'Minas Gerais'
+        WHEN Location LIKE '%Porto Alegre%' OR StorageLocation LIKE '%RS%' THEN 'Rio Grande do Sul'
+        WHEN Location LIKE '%Curitiba%' OR StorageLocation LIKE '%PR%' THEN 'Paraná'
+        ELSE 'Outros'
+    END AS Estado
+FROM StorageLocation sl
+LEFT JOIN ProductStorage ps ON sl.idLproduct = ps.idProduct
+GROUP BY Estado
+ORDER BY Estado;
+
+-- Busca o número do pedido, nome do cliente, nome do produto pedido, localização do estoque do produto.
+SELECT
+    o.idOrder AS Numero_Pedido,
+    Concat (c.Fname, ' ', c.Lname) AS Nome_Cliente,
+    p.Pname AS Nome_Produto,
+    sl.Location AS Localizacao_Estoque
+FROM orders o
+JOIN productOrder po ON o.idOrder = po.idPOorder
+JOIN product p ON po.idPOproduct = p.idProduct
+JOIN StorageLocation sl ON p.idProduct = sl.idLproduct
+JOIN client c ON o.idOrderClient = c.idClient
+ORDER BY o.idOrder, c.Fname;
+
+-- Retorna o valor total do pedido (preço unitário x quantidade + frete)
+SELECT 
+    o.idOrder,
+    Concat (c.Fname,' ',c.Lname) AS Cliente,
+    p.Pname AS Produto,
+    po.poQuantity AS Quantidade,
+    p.Price AS Preco_Unitario,
+    (po.poQuantity * p.Price) AS Total_Produto,
+    o.SendValue AS Frete,
+    (po.poQuantity * p.Price) + o.SendValue AS Total_Pedido
+FROM Orders o
+JOIN Client c ON o.idOrderClient = c.idClient
+JOIN productOrder po ON o.idOrder = po.idPOorder
+JOIN Product p ON po.idPOproduct = p.idProduct
+ORDER BY o.idOrder;
+
+
+
+    
