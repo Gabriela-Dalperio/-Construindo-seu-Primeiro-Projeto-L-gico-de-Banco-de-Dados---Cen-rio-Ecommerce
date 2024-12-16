@@ -2,18 +2,18 @@
 use ecommerce;
 show tables;
 
--- CLIENTE DEU CERTO: IDS: 13 AO 17   
+-- CLIENTE 
 insert into client (Fname,Minit,Lname,IdentificationType,IdentificationNumber,Bdate,Adreess) values
-	('Maria','M','Silva','CPF',12345678901,'2001-01-15','Rua Silva de Prata 29, Carangola - Cidade das Flores'),
+    ('Maria','M','Silva','CPF',12345678901,'2001-01-15','Rua Silva de Prata 29, Carangola - Cidade das Flores'),
     ('Matheus','O','Pimentel','CPF',12345678902,'1997-04-23','Rua Alemeda 289, Centro - Cidade das Flores' ),
     ('Ricardo','F','Silva','CNPJ',1234567890321,'1980-10-28','Avenida Alemeda 1009, Centro - Cidade das Flores' ),
     ('Julia','S','França','CPF',12345678904,'1976-09-14','Rua Laranjeiras 861, Centro - Cidade das Flores' ),
     ('Isabela','M','Cruz','CPF',12345678906,'1992-08-30','Avenida Alemeda das Flores 28, Centro - Cidade das Flores');
     SELECT * FROM CLIENT;
     
--- PRODUTOS DEU CERTO IDS: 9 AO 16
+-- PRODUTOS
 insert into Product (Pname,Classification_Kids,Category,Avaliation,PDescription,Size,Price,Estoque) values
-	('Fone de ouvido Bluetooth',false,'Eletrônico e Dispositivos',4,'Resistente a água','Unidade',71.49,'Em estoque'),
+    ('Fone de ouvido Bluetooth',false,'Eletrônico e Dispositivos',4,'Resistente a água','Unidade',71.49,'Em estoque'),
     ('Boneca Princesa Moana',true,'Brinquedos e Itens para Crianças e Bebês',3,'Acessórios não incluso','Size - 45cm',124.90,'Aguardando reposição'),
     ('Kit Body Carters',true,'Brinquedos e Itens para Crianças e Bebês',5,'Cores sortidas','Até 1 ano',179.90,'Em estoque'),
     ('Microfone Vedo - Youtuber',false,'Eletrônico e Dispositivos',4,' ','Unidade',395.99,'Em estoque'),
@@ -26,44 +26,44 @@ UPDATE product
 SET Estoque = 'Em estoque'
 WHERE Pname = 'Boneca Princesa Moana';
 
--- FORNECEDOR DEU CERTO IDS: 1 AO 4
+-- FORNECEDOR
 insert into supplier (SocialName, CNPJ,Contact) values
-	('Fornecedor A','12345678000101','fa@mail.com'),
+    ('Fornecedor A','12345678000101','fa@mail.com'),
     ('Fornecedor B','23456789000102','fb@mail.com'),
     ('Fornecedor C','34567891000103','11988765412'),
     ('Fornecedor D','45678912000101','22984637298');
 SELECT * FROM SUPPLIER;
 
--- VENDEDOR DEU CERTO IDS: 1 AO 8 (3 E 4 TAMBÉM SÃO FORNECEDORES)
+-- VENDEDOR
 insert into seller (SellerSocialName, AbstName, SellerIdentificationType, SellerIdentificationNumber, SellerLocation) values
-	('Vendedor A', 'A', 'CNPJ','98765432000101','São Paulo'),
-	('Vendedor B', 'B', 'CNPJ','87654321000102','Rio de Janeiro'),
+    ('Vendedor A', 'A', 'CNPJ','98765432000101','São Paulo'),
+    ('Vendedor B', 'B', 'CNPJ','87654321000102','Rio de Janeiro'),
     ('Fornecedor C','FC','CNPJ','34567891000103','São Paulo'),
     ('Fornecedor D','FD','CNPJ','45678912000101','Rio de Janeiro'),
     ('Vendedor C', 'C', 'CNPJ','76543212000101','Espírito Santo'),
-	('Vendedor D', 'D', 'CPF','87654321034','Minas Gerais'),
+    ('Vendedor D', 'D', 'CPF','87654321034','Minas Gerais'),
     ('Vendedor Z', 'Z', 'CNPJ','65432123000101','Rio Grande do Sul'),
-	('Vendedor J', 'J', 'CPF','54321234102','Paraná');
+    ('Vendedor J', 'J', 'CPF','54321234102','Paraná');
 SELECT * FROM seller;
 
--- PEDIDO DEU CERTO IDS: 5 AO 8/ IDCLIENTES: 13 AO 16
+-- PEDIDO 
 insert into orders (idOrderClient, idOrderPaymentMethod, OrderStatus, OrderDescription, OrderDate, Total_Price, SendValue, PaymentCash) values
-	(13,1, default,'Compra via aplicativo','2024-12-10',71.49,default,true),
-	(14,2, default,'Compra via aplicativo','2024-03-12',428.85,50,false),
+    (13,1, default,'Compra via aplicativo','2024-12-10',71.49,default,true),
+    (14,2, default,'Compra via aplicativo','2024-03-12',428.85,50,false),
     (15,1, 'Confirmado','Compra via aplicativo','2024-05-07',1299.00,default,false),
     (16,3, default, 'Compra via web site','2024-02-09',179.90,35,false);
 SELECT * FROM orders;
 
- -- CAMPO idPayment doesn't have a default value
+ -- PAGAMENTO
 insert into payment (idClient,idOrder,Payment_Method,Cname,Cnumber,ValidDate,CV) values
-	(13,5,'Boleto',null,null,null,null),
+    (13,5,'Boleto',null,null,null,null),
     (14,6,'Cartão','Matheus O Pimentel','1234-5678-9876-5432','2028-06-07','111'),
-	(15,7,'Boleto',null,null,null,null),
+    (15,7,'Boleto',null,null,null,null),
     (16,8,'Cartão','Julia S França','5432-1234-5678-9876','2026-04-09','222');
   
--- PEDIDO PRODUTO DEU CERTO
+-- PEDIDO PRODUTO
 insert into productOrder (idPOproduct,idPOorder,poQuantity,poStatus) values
-	(13,5,2,default),
+    (13,5,2,default),
     (14,6,2,default),
     (15,7,1,default),
     (16,8,1,default);
@@ -72,10 +72,10 @@ UPDATE productOrder
 SET poQuantity = 4
 WHERE idPOproduct = 14;
 
--- PRODUTOS POR FORNECEDOR DEU CERTO
+-- PRODUTOS POR FORNECEDOR
 insert into productsupplier (idPsSupplier, idPsProduct, Quantity) values
-	(1,9,100),
-	(1,12,150),
+    (1,9,100),
+    (1,12,150),
     (2,11,90),
     (2,10,20),
     (3,16,10),
@@ -87,31 +87,31 @@ UPDATE productsupplier
 SET quantity = 0
 WHERE idPsProduct = 16 AND idPsProduct = 10;
 
--- ESTOQUELOCATION DEU CERTO
+-- ESTOQUELOCATION
 insert into StorageLocation (idLproduct, idLstorage, Location) values
-	(9,1,'Centro de Distribuição - São Paulo'),
+    (9,1,'Centro de Distribuição - São Paulo'),
     (14,2,'Centro de Distribuição - São Paulo'),
     (11,3,'Centro de Distribuição - São Paulo'),
     (16,4,'Centro de Distribuição - São Paulo'),
-	(10,5,'Centro de Distribuição - Rio de Janeiro'),
+    (10,5,'Centro de Distribuição - Rio de Janeiro'),
     (13,6,'Centro de Distribuição - Rio de Janeiro'),
     (12,7,'Centro de Distribuição - Rio de Janeiro'),
     (15,8,'Centro de Distribuição - Rio de Janeiro'),
-	(16,9,'Centro de Distribuição - Vitória'),
+    (16,9,'Centro de Distribuição - Vitória'),
     (14,10,'Armazém - Belo Horizonte'),
     (9,11,'Centro de Distribuição - Porto Alegre'),
     (12,12,'Centro de Distribuição - Porto Alegre'),
     (15,13,'Centro de Distribuição - Porto Alegre'),
-	(10,14,'Armazém - Curitiba'),
+    (10,14,'Armazém - Curitiba'),
     (11,15,'Armazém - Curitiba'),
     (16,16,'Armazém - Curitiba');
 SELECT * FROM StorageLocation;
 
--- PRODUTO POR VENDEDOR DEU CERTO
+-- PRODUTO POR VENDEDOR
 insert into productseller (idPSeller,idPproduct ,ProductQuantity) values
-	(1,9,50),
+    (1,9,50),
     (1,14,97),
-	(2,10,25),
+    (2,10,25),
     (3,11,42),
     (4,12,72),
     (2,13,81),
@@ -124,9 +124,9 @@ UPDATE productseller
 SET ProductQuantity = 0
 WHERE idPproduct = 16;
     
--- PRODUCTSTORAGE DEU CERTO: ACHO QUE AINDA PRECISA MELHORAR PRA LOCAL FICAR COM O MESMO ID
+-- PRODUCTSTORAGE
 insert into productstorage (idProduct,StorageLocation,Quantity) values
-	(9,'Local SP',50), 
+    (9,'Local SP',50), 
     (14,'Local SP',135),
     (11,'Local SP',42),
     (16,'Local SP',10), 
@@ -144,9 +144,9 @@ insert into productstorage (idProduct,StorageLocation,Quantity) values
     (16,'Local PR',23);
 SELECT * FROM productstorage;
 
--- DELIVERY DEU CERTO
+-- DELIVERY 
  insert into Delivery (idDOrder, DeliveryStatus, TrackingCode, DeliveryMethod, DeliveryDate, DeliveryAddress) values
-	(5,'Em trânsito','BR123456','Correios','2024-12-23','Rua Silva de Prata 29, Carangola - Cidade das Flores'),
+    (5,'Em trânsito','BR123456','Correios','2024-12-23','Rua Silva de Prata 29, Carangola - Cidade das Flores'),
     (6,'Falha na entrega','TR123456','Transportadora','2024-03-28','Rua Alemeda 289, Centro - Cidade das Flores'),
     (7,'Entregue','TR234567','Transportadora','2024-05-19','Avenida Alemeda 1009, Centro - Cidade das Flores'),
     (8,'Entregue','BR234567','Correios','2024-03-01','Rua Laranjeiras 861, Centro - Cidade das Flores');
