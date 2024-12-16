@@ -5,7 +5,7 @@ use ecommerce;
 
 -- criar tabela cliente
 create table client(
-	idClient int auto_increment primary key,
+    idClient int auto_increment primary key,
     Fname varchar(15),
     Minit char (3),
     Lname varchar (20),
@@ -20,14 +20,14 @@ create table client(
 
 -- criar tabela produto
 create table product(
-	idProduct int auto_increment primary key,
+    idProduct int auto_increment primary key,
     Pname varchar (100) not null,
     Classification_Kids bool default false,
     Category ENUM ('Eletrônico e Dispositivos', 'Moda e Beleza', 'Brinquedos e Itens para Crianças e Bebês',
-					'Alimentos e Bebidas', 'Casa e Construção', 'Livros e Ebooks', 'Saúde e Cuidados Pessoais',
-                    'Pet Shop','Esportes') not null,
-	Avaliation float default 0,
-	PDescription varchar (50),
+		  'Alimentos e Bebidas', 'Casa e Construção', 'Livros e Ebooks', 'Saúde e Cuidados Pessoais',
+                'Pet Shop','Esportes') not null,
+    Avaliation float default 0,
+    PDescription varchar (50),
     Size varchar(13),
     Price decimal(10,2) not null,
     Estoque ENUM ('Em estoque', 'Aguardando reposição')
@@ -36,27 +36,25 @@ create table product(
 -- alter table product;
 
 -- criar tabela de pedido
--- paymentcash = boleto, se não for ele, o método de pagamento é da outra tabela
 create table Orders(
-	idOrder int auto_increment primary key,
+    idOrder int auto_increment primary key,
     idOrderClient int,
     idOrderPaymentMethod int,
     OrderStatus ENUM('Cancelado', 'Confirmado', 'Em processamento') default 'Em processamento',
-	OrderDescription varchar (255),
+    OrderDescription varchar (255),
     SendValue float default 10,
     OrderDate date,
-	Total_Price decimal (10,2) not null,
-	PaymentCash bool default false,
+    Total_Price decimal (10,2) not null,
+    PaymentCash bool default false,
     constraint fk_order_client foreign key (idOrderClient) references client (idClient)
-		on update cascade
+   	on update cascade
 );
 -- alter table orders;
 -- alter table Orders auto_increment=1;
 
-
 -- criar tabela método de pagamento
 create table payment(
-	idClient int,
+    idClient int,
     idOrder int,
     idPayment int,
     Payment_Method ENUM ('Boleto','Cartão', '2 ou mais Cartões') not null,
@@ -64,16 +62,17 @@ create table payment(
     Cnumber int,
     ValidDate date,
     CV char(3),
-	primary key (idClient, idOrder, idPayment),
+    primary key (idClient, idOrder, idPayment),
     constraint fk_payment_client foreign key (idClient) references client(idClient),
     constraint fk_payment_order foreign key (idOrder) references Orders(idOrder),
-    CHECK (Payment_Method = 'Boleto' OR (Payment_Method IN ('Cartão', '2 ou mais Cartões') AND (Cname AND Cnumber AND ValidDate AND CV )IS NOT NULL))
+    CHECK (Payment_Method = 'Boleto' OR (Payment_Method IN ('Cartão', '2 ou mais Cartões') 
+	   	AND (Cname AND Cnumber AND ValidDate AND CV )IS NOT NULL))
 );
 -- alter table payment;
 
 -- criar tabela estoque
 create table productStorage(
-	idProdStorage int auto_increment primary key,
+    idProdStorage int auto_increment primary key,
     idProduct int not null,
     StorageLocation varchar(45),
     Quantity int default 0,
@@ -84,7 +83,7 @@ create table productStorage(
 
 -- criar tabela fornecedor
 create table supplier(
-	idSupplier int auto_increment primary key,
+    idSupplier int auto_increment primary key,
     SocialName varchar(255) not null,
     CNPJ char(15) not null,
     Contact char(11) not null,
@@ -94,11 +93,11 @@ create table supplier(
 
 -- criar tabela vendedor
 create table seller(
-	idSeller int auto_increment primary key,
+    idSeller int auto_increment primary key,
     SellerSocialName varchar(255) not null,
-	AbstName varchar(255),
+    AbstName varchar(255),
     SellerIdentificationType ENUM ('CPF','CNPJ') not null,
-	SellerIdentificationNumber varchar(15),
+    SellerIdentificationNumber varchar(15),
     SellerLocation varchar(255),
     constraint unique_SellerIdentificationNumber unique (SellerIdentificationNumber)
 );
@@ -107,7 +106,7 @@ create table seller(
 
 -- criar tabela ProdutoVendedor (terceiro)
 create table productSeller(
-	idPSeller int,
+    idPSeller int,
     idPproduct int,
     ProductQuantity int default 1,
     primary key (idPSeller, idPproduct),
@@ -117,7 +116,7 @@ create table productSeller(
 
 -- criar tabela Relação de Produto/Pedido
 create table productOrder(
-	idPOproduct int,
+    idPOproduct int,
     idPOorder int,
     poQuantity int default 1,
     poStatus ENUM ('Disponível','Sem estoque') default 'Disponível',
@@ -128,7 +127,7 @@ create table productOrder(
 
 -- criar tabela storageLocation
 create table storageLocation(
-	idLproduct int,
+    idLproduct int,
     idLstorage int,
     Location varchar(255) not null,
     primary key (idLproduct, idLstorage),
@@ -139,7 +138,7 @@ alter table storageLocation;
 
 -- criar tabela fornecedor disponibiliza produto
 create table productSupplier(
-	idPsSupplier int,
+    idPsSupplier int,
     idPsProduct int,
     Quantity int not null,
     primary key (idPsSupplier,  idPsProduct),
@@ -160,4 +159,3 @@ create table Delivery (
 );
 -- alter table delivery auto_increment=1;
 -- alter table delivery;
-
